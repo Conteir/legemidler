@@ -31,3 +31,5 @@ export const fetchConceptIdSite =
   "%20OR%20(%3C%3C261217004%3A738774007%3D" +
   defaultDrugId +
   "))))";
+
+export const fetchFormId = "/concepts?ecl=%3C736478001%20Minus%20%3C!736478001";

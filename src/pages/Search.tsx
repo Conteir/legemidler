@@ -11,6 +11,7 @@ import { defaultBranch, hosts } from "../config";
 import {
   fetchBranches,
   fetchIntendedSites,
+  fetchForms,
   fetchConcepts,
   IConceptResult,
 } from "../store";
@@ -25,6 +26,7 @@ const useSearch = () => {
   const [host, setHost] = useQueryParam("h", StringParam);
   const [branch, setBranch] = useQueryParam("b", StringParam);
   const [intendedSite, setIntendedSite] = useQueryParam("is", StringParam);
+  const [form, setForm] = useQueryParam("f", StringParam);
 
   // Debounce the original search async function
   const debouncedSearch = useConstant(() => debounce(fetchConcepts, 500));
@@ -34,20 +36,21 @@ const useSearch = () => {
       return debouncedSearch(host, branch, query || "");
     }
     return ({} as any) as Readonly<IConceptResult>;
-  }, [query, branch, intendedSite]); // Ensure a new request is made everytime the text changes (even if it's debounced)
+  }, [query, branch, intendedSite, form]); // Ensure a new request is made everytime the text changes (even if it's debounced)
 
   // Return everything needed for the hook consumer
   return {
     host,
     branch,
     query,
-
+    form,
     intendedSite,
     searchRequest,
     setBranch,
     setHost,
     setQuery,
     setIntendedSite,
+    setForm,
   };
 };
 
@@ -61,6 +64,8 @@ const Search = ({ scope }: SearchProps) => {
     setHost,
     intendedSite,
     setIntendedSite,
+    form,
+    setForm,
     searchRequest,
   } = useSearch();
 
@@ -92,6 +97,21 @@ const Search = ({ scope }: SearchProps) => {
     }
   }, [intendedSite, intededSiteRequest, setIntendedSite]);
 
+  const formRequest = useAsync(fetchForms, [
+    host || hosts[0],
+    branch || defaultBranch,
+  ]);
+
+  useEffect(() => {
+    if (formRequest.result && !form) {
+      const { conceptId } =
+        formRequest.result.items.find((f) => f.conceptId === "666") || {};
+      if (conceptId) {
+        setForm(conceptId);
+      }
+    }
+  }, [form, formRequest, setForm]);
+
   useEffect(() => {
     if (!host) {
       setHost(hosts[0]);
@@ -111,6 +131,10 @@ const Search = ({ scope }: SearchProps) => {
 
   const handleIntendedSiteChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setIntendedSite(event.target.value);
+  };
+
+  const handleFormChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setForm(event.target.value);
   };
 
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -244,11 +268,18 @@ const Search = ({ scope }: SearchProps) => {
                   </div>
                   <div className="col-md-4">
                     <div className="form-group">
-                      <label htmlFor="form">Form</label>
-                      <select id="form" className="form-control">
-                        <option>Form 1</option>
-                        <option>Form 2</option>
-                        <option>Form 3</option>
+                      <label htmlFor="form">Form:</label>
+                      <select
+                        id="form"
+                        className="form-control"
+                        onChange={handleFormChange}
+                      >
+                        {formRequest.result &&
+                          formRequest.result.items.map(({ pt, conceptId }) => (
+                            <option value={conceptId} key={pt.term}>
+                              {pt.term}
+                            </option>
+                          ))}
                       </select>
                     </div>
                   </div>
@@ -271,17 +302,23 @@ const Search = ({ scope }: SearchProps) => {
           </div>
         </div>
         <div className="row">
-          <div className="col-3 col-md-8">
+          <div className="col-12">
             <h2>Resultat</h2>
           </div>
-          <table>
-            <tbody>
-              <tr>
-                <td>ConceptId Intended site</td>
-                <td>{intendedSite}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="col-12">
+            <table>
+              <tbody>
+                <tr>
+                  <td>ConceptId Intended site</td>
+                  <td>{intendedSite}</td>
+                </tr>
+                <tr>
+                  <td>ConceptId Form</td>
+                  <td>{form}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
