@@ -1,26 +1,23 @@
 import { apiOptions, handleResponse } from "../api";
-import { fetchConceptIdSite } from "../config";
+import { fetchAdmId } from "../config";
 
 //definisjon av objekt. Egneskaper. I = interface = "kontakt"
-export interface IIntendedSite {
+export interface IAdm {
   conceptId: string;
   pt: { term: string };
 }
 //array av objekter
-interface IIntendedSites {
-  items: IIntendedSite[];
+interface IAdms {
+  items: IAdm[];
 }
 
-export const fetchIntendedSites = (
+export const fetchAdms = (
   host: string,
   branch: string,
   conceptIdSubstance: string,
 ) => {
-  const url = new URL(
-    `${branch + fetchConceptIdSite(conceptIdSubstance)}`,
-    host,
-  );
+  const url = new URL(`${branch + fetchAdmId(conceptIdSubstance)}`, host);
   return fetch(url.toString(), apiOptions).then((response) =>
-    handleResponse<IIntendedSites>(response),
+    handleResponse<IAdms>(response),
   );
 };

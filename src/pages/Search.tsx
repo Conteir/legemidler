@@ -7,19 +7,22 @@ import Concept from "../components/Concept";
 import Error from "../components/Error";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
-import { defaultBranch, hosts } from "../config";
+import { defaultBranch, hosts, defaultConceptIdSubstance } from "../config";
 import {
   fetchBranches,
   fetchIntendedSites,
+  fetchReleases,
   fetchForms,
+  fetchAdms,
   fetchConcepts,
   IConceptResult,
 } from "../store";
 
+const conceptIdSubstance = defaultConceptIdSubstance;
+
 type SearchProps = {
   scope: string;
 };
-
 const useSearch = () => {
   // Handle the input text state
   const [query, setQuery] = useQueryParam("q", StringParam);
@@ -27,6 +30,8 @@ const useSearch = () => {
   const [branch, setBranch] = useQueryParam("b", StringParam);
   const [intendedSite, setIntendedSite] = useQueryParam("is", StringParam);
   const [form, setForm] = useQueryParam("f", StringParam);
+  const [rel, setRel] = useQueryParam("r", StringParam);
+  const [adm, setAdm] = useQueryParam("a", StringParam);
 
   // Debounce the original search async function
   const debouncedSearch = useConstant(() => debounce(fetchConcepts, 500));
@@ -36,7 +41,7 @@ const useSearch = () => {
       return debouncedSearch(host, branch, query || "");
     }
     return ({} as any) as Readonly<IConceptResult>;
-  }, [query, branch, intendedSite, form]); // Ensure a new request is made everytime the text changes (even if it's debounced)
+  }, [query, branch, intendedSite, form, rel, adm]); // Ensure a new request is made everytime the text changes (even if it's debounced)
 
   // Return everything needed for the hook consumer
   return {
@@ -44,6 +49,8 @@ const useSearch = () => {
     branch,
     query,
     form,
+    rel,
+    adm,
     intendedSite,
     searchRequest,
     setBranch,
@@ -51,6 +58,8 @@ const useSearch = () => {
     setQuery,
     setIntendedSite,
     setForm,
+    setAdm,
+    setRel,
   };
 };
 
@@ -64,6 +73,10 @@ const Search = ({ scope }: SearchProps) => {
     setHost,
     intendedSite,
     setIntendedSite,
+    rel,
+    setRel,
+    adm,
+    setAdm,
     form,
     setForm,
     searchRequest,
@@ -84,6 +97,7 @@ const Search = ({ scope }: SearchProps) => {
   const intededSiteRequest = useAsync(fetchIntendedSites, [
     host || hosts[0],
     branch || defaultBranch,
+    conceptIdSubstance,
   ]);
 
   useEffect(() => {
@@ -96,6 +110,39 @@ const Search = ({ scope }: SearchProps) => {
       }
     }
   }, [intendedSite, intededSiteRequest, setIntendedSite]);
+
+  const adminRequest = useAsync(fetchAdms, [
+    host || hosts[0],
+    branch || defaultBranch,
+    conceptIdSubstance,
+  ]);
+
+  useEffect(() => {
+    if (adminRequest.result && !adm) {
+      const { conceptId } =
+        adminRequest.result.items.find((a) => a.conceptId === "666") || {};
+      if (conceptId) {
+        setAdm(conceptId);
+      }
+    }
+  }, [adm, adminRequest, setAdm]);
+  console.log(adm);
+
+  const relRequest = useAsync(fetchReleases, [
+    host || hosts[0],
+    branch || defaultBranch,
+    conceptIdSubstance,
+  ]);
+
+  useEffect(() => {
+    if (relRequest.result && !rel) {
+      const { conceptId } =
+        relRequest.result.items.find((r) => r.conceptId === "666") || {};
+      if (conceptId) {
+        setRel(conceptId);
+      }
+    }
+  }, [rel, relRequest, setRel]);
 
   const formRequest = useAsync(fetchForms, [
     host || hosts[0],
@@ -137,6 +184,14 @@ const Search = ({ scope }: SearchProps) => {
     setForm(event.target.value);
   };
 
+  const handleAdmChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setAdm(event.target.value);
+  };
+
+  const handleRelChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setRel(event.target.value);
+  };
+
   const handleQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
     setQuery(event.target.value);
   };
@@ -144,6 +199,35 @@ const Search = ({ scope }: SearchProps) => {
   const branches = branchRequest.result || [];
   //const intendedSites = intededSiteRequest.result || [];
   const { items = [] } = searchRequest.result || {};
+  const fetchGenericUrl =
+    (host || hosts[0]) +
+    "/" +
+    (branch || defaultBranch) +
+    "/concepts?ecl=%3C%3C763158003%3A762949000%3D(" +
+    conceptIdSubstance +
+    "%20OR%20(%3C%3C105590001%3A738774007%3D" +
+    conceptIdSubstance +
+    "))%2C411116001%3D((%3C%3C736542009%3A736475003%3D" +
+    rel +
+    "%2C736472000%3D" +
+    adm +
+    "%2C736474004%3D" +
+    intendedSite +
+    "%2C736476002%3D" +
+    form +
+    ")%20OR%20%20(%3C%3C736542009%3A736475003%3D" +
+    rel +
+    "%2C736472000%3D" +
+    adm +
+    "%2C736474004%3D" +
+    intendedSite +
+    "%2C736476002%3D" +
+    form +
+    "%2C736473005%3D736853009))";
+  const fetchCommercial =
+    (host || hosts[0]) +
+    "/browser/" +
+    "MAIN%2FSNOMEDCT-NO%2FREFSETS/members?referenceSet=6021000202106&referencedComponentId=[genericDrugId]";
 
   return (
     <div className="container">
@@ -235,8 +319,23 @@ const Search = ({ scope }: SearchProps) => {
                   </div>
                   <div className="col-md-4">
                     <div className="form-group">
-                      <label htmlFor="Frigivelse">Frigivelse</label>
-                      <input />
+                      <label htmlFor="Frigivelse">Frigivelse:</label>
+                      <select
+                        defaultValue=""
+                        id="rel"
+                        className="form-control"
+                        onChange={handleRelChange}
+                      >
+                        <option value="" disabled>
+                          Velg
+                        </option>
+                        {relRequest.result &&
+                          relRequest.result.items.map(({ pt, conceptId }) => (
+                            <option value={conceptId} key={pt.term}>
+                              {pt.term}
+                            </option>
+                          ))}
+                      </select>
                     </div>
                   </div>
                 </div>
@@ -244,17 +343,36 @@ const Search = ({ scope }: SearchProps) => {
                   <div className="col-md-4">
                     <div className="form-group">
                       <label htmlFor="admMetode">Adm. metode</label>
-                      <input />
+                      <select
+                        defaultValue=""
+                        id="adm"
+                        className="form-control"
+                        onChange={handleAdmChange}
+                      >
+                        <option value="" disabled>
+                          Velg
+                        </option>
+                        {adminRequest.result &&
+                          adminRequest.result.items.map(({ pt, conceptId }) => (
+                            <option value={conceptId} key={pt.term}>
+                              {pt.term}
+                            </option>
+                          ))}
+                      </select>
                     </div>
                   </div>
                   <div className="col-md-4">
                     <div className="form-group">
                       <label htmlFor="intendedSite">Intended site:</label>
                       <select
-                        id="intendedSite"
+                        defaultValue=""
+                        id="conceptIdSite"
                         className="form-control"
                         onChange={handleIntendedSiteChange}
                       >
+                        <option value="" disabled>
+                          Velg
+                        </option>
                         {intededSiteRequest.result &&
                           intededSiteRequest.result.items.map(
                             ({ pt, conceptId }) => (
@@ -269,11 +387,16 @@ const Search = ({ scope }: SearchProps) => {
                   <div className="col-md-4">
                     <div className="form-group">
                       <label htmlFor="form">Form:</label>
+
                       <select
+                        defaultValue=""
                         id="form"
                         className="form-control"
                         onChange={handleFormChange}
                       >
+                        <option value="" disabled>
+                          Velg
+                        </option>
                         {formRequest.result &&
                           formRequest.result.items.map(({ pt, conceptId }) => (
                             <option value={conceptId} key={pt.term}>
@@ -303,21 +426,78 @@ const Search = ({ scope }: SearchProps) => {
         </div>
         <div className="row">
           <div className="col-12">
-            <h2>Resultat</h2>
+            <h2>Fetch generic dugs</h2>
           </div>
           <div className="col-12">
-            <table>
-              <tbody>
-                <tr>
-                  <td>ConceptId Intended site</td>
-                  <td>{intendedSite}</td>
-                </tr>
-                <tr>
-                  <td>ConceptId Form</td>
-                  <td>{form}</td>
-                </tr>
-              </tbody>
-            </table>
+            <p>
+              When botton is clicked, we should run request below. Please note{" "}
+              <br />
+              that the URL is dynamicly generated be the application. The
+              <br />
+              substance is for the moment hardcoded to Diazepam (this could be
+              <br />
+              changed in the config.ts)
+            </p>
+            <p>Fetch gerneric URL: {fetchGenericUrl} </p>
+            <p>
+              The result will be generic drugs based upon substance (always{" "}
+              <br />
+              Diazepam), administation route, form, intended site and release.{" "}
+              <br />
+            </p>
+            <p>
+              You can try to generate an url based on:
+              <br />
+              - Frigivelse: Conventional release
+              <br />
+              - Adm.metode: Swallow
+              <br />
+              - Intended site: oral
+              <br />- Form: Tablett
+            </p>
+            <p>The result should be sevral generic clinical drugs</p>
+
+            <h3>Render first part</h3>
+
+            <p>The result should be rendered like this:</p>
+            <ul>
+              <li>Generic drug 1: [preferredTerm] [concetpId]</li>
+              <li>Generic drug 2: [preferredTerm] [concetpId]</li>
+              <li>[...]</li>
+            </ul>
+            <h2>Fetch commercial drugs</h2>
+            <p>
+              Each of this generic drugs could have one or more commercial drugs
+            </p>
+            <p>
+              To fetch this, we have to use the conceptId from the last <br />
+              response, and do a new query for each gerenic drug
+            </p>
+            <p>
+              You could use this url, where [genericDrugId] = conceptId in the
+              first response
+            </p>
+            <p>Fetch commercial URL: {fetchCommercial} </p>
+            <p>... so you have to do this request for EVERY generic drug</p>
+            <h3>Render it all</h3>
+            <p>The overall result should be like this:</p>
+            <ul>
+              <li>Generic drug 1: [preferredTerm] [concetpId]</li>
+              <ul>
+                <li>Commercial drug 1: [NavnFormStyrke] [MerkevareId]</li>
+                <li>Commercial drug 2: [NavnFormStyrke] [MerkevareId]</li>
+                <li>Commercial drug 3: [NavnFormStyrke] [MerkevareId]</li>
+                <li>[...]</li>
+              </ul>
+              <li>Generic drug 2: [preferredTerm] [concetpId]</li>
+              <ul>
+                <li>Commercial drug 1: [NavnFormStyrke] [MerkevareId]</li>
+                <li>Commercial drug 2: [NavnFormStyrke] [MerkevareId]</li>
+                <li>Commercial drug 3: [NavnFormStyrke] [MerkevareId]</li>
+                <li>[...]</li>
+              </ul>
+              <li>[...]</li>
+            </ul>
           </div>
         </div>
       </div>
