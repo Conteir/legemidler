@@ -18,7 +18,9 @@ import {
   IConceptResult,
 } from "../store";
 
-const conceptIdSubstance = defaultConceptIdSubstance;
+let conceptIdSubstance = defaultConceptIdSubstance;
+
+console.log(conceptIdSubstance);
 
 type SearchProps = {
   scope: string;
@@ -126,7 +128,6 @@ const Search = ({ scope }: SearchProps) => {
       }
     }
   }, [adm, adminRequest, setAdm]);
-  console.log(adm);
 
   const relRequest = useAsync(fetchReleases, [
     host || hosts[0],
@@ -276,48 +277,58 @@ const Search = ({ scope }: SearchProps) => {
                     </div>
                   </>
                 )}
+                <div className="col-md-12">
+                  <div className="form-group">
+                    <label htmlFor="query">Substans</label>
+                    <input
+                      id="query"
+                      className="form-control"
+                      type="text"
+                      value={query}
+                      autoComplete="off"
+                      onChange={handleQueryChange}
+                    />
+                    <section aria-labelledby="results">
+                      <ul className="list-group">
+                        {items.map(
+                          ({
+                            concept: {
+                              conceptId,
+                              fsn: { term: fullySpecifiedName },
+                              pt: { term: preferredTerm },
+                            },
+                          }) => (
+                            <li
+                              onClick={() => {
+                                conceptIdSubstance = conceptId;
+                                console.log(
+                                  "Dopet " +
+                                    preferredTerm +
+                                    " har SCTID " +
+                                    conceptId,
+                                );
+                              }}
+                              style={{ cursor: "pointer" }}
+                              key={conceptId}
+                              className="list-group-item mb-12"
+                            >
+                              <Concept
+                                host={host || hosts[0]}
+                                branch={branch || ""}
+                                preferredTerm={preferredTerm}
+                                fullySpecifiedName={fullySpecifiedName}
+                                conceptId={conceptId}
+                                scope={scope}
+                              />
+                            </li>
+                          ),
+                        )}
+                      </ul>
+                    </section>
+                  </div>
+                </div>
                 <div className="row">
                   <div className="col-md-8">
-                    <div className="form-group">
-                      <label htmlFor="query">Substans</label>
-                      <input
-                        id="query"
-                        className="form-control"
-                        type="text"
-                        value={query}
-                        autoComplete="off"
-                        onChange={handleQueryChange}
-                      />
-                      <section aria-labelledby="results">
-                        <ul className="list-group">
-                          {items.map(
-                            ({
-                              concept: {
-                                conceptId,
-                                fsn: { term: fullySpecifiedName },
-                                pt: { term: preferredTerm },
-                              },
-                            }) => (
-                              <li
-                                key={conceptId}
-                                className="list-group-item mb-2"
-                              >
-                                <Concept
-                                  host={host || hosts[0]}
-                                  branch={branch || ""}
-                                  preferredTerm={preferredTerm}
-                                  fullySpecifiedName={fullySpecifiedName}
-                                  conceptId={conceptId}
-                                  scope={scope}
-                                />
-                              </li>
-                            ),
-                          )}
-                        </ul>
-                      </section>
-                    </div>
-                  </div>
-                  <div className="col-md-4">
                     <div className="form-group">
                       <label htmlFor="Frigivelse">Frigivelse:</label>
                       <select
