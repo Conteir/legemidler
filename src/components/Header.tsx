@@ -15,8 +15,10 @@ const Header = ({ scope }: HeaderProps) => {
   return (
     <header className="row">
       <div>
-      <h1>Search Snowstorm @ E-helse</h1>
-    </div>
+        <h1>Search for your preferable upper or downer</h1>
+        <p>Hint: Diazepam or Methylphenidate</p>
+        <p>Have a nice day!!!</p>
+      </div>
       <div className="col">
         <nav className="navbar navbar-expand mb-3">
           <ul className="navbar-nav mr-auto">
@@ -25,7 +27,7 @@ const Header = ({ scope }: HeaderProps) => {
                 Resett
               </Link>
             </li>
-           
+
             {false && (
               <li className={itemClassNames("helsenorge")}>
                 <Link className="nav-link" to="/?scope=helsenorge">
