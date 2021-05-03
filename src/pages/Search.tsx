@@ -236,7 +236,7 @@ const Search = ({ scope }: SearchProps) => {
   const fetchCommercial =
     (host || hosts[0]) +
     "/browser/" +
-    "MAIN%2FSNOMEDCT-NO%2FREFSETS/members?referenceSet=6021000202106&referencedComponentId=[genericDrugId]";
+    "MAIN%2FSNOMEDCT-NO%2FREFSETS/members?referenceSet=6021000202106&referencedComponentId=";
 
   return (
     <div className="container">
