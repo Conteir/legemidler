@@ -7,6 +7,7 @@ import Concept from "../components/Concept";
 import Error from "../components/Error";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
+import DrugListComponent from "../components/DrugListComponent";
 import { defaultBranch, hosts, defaultConceptIdSubstance } from "../config";
 import {
   fetchBranches,
@@ -419,7 +420,11 @@ const Search = ({ scope }: SearchProps) => {
                   </div>
                 </div>
               </div>
-              <input type="submit" value="Søk etter legemiddel" />
+              {/*<input type="submit" value="Søk etter legemiddel" />*/}
+              <DrugListComponent
+                genericUrl={fetchGenericUrl}
+                commercialUrl={fetchCommercial}
+              />
             </form>
           )}
         </div>
