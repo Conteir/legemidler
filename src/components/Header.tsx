@@ -15,7 +15,7 @@ const Header = ({ scope }: HeaderProps) => {
   return (
     <header className="row">
       <div>
-        <h1>Search for your preferable upper or downer</h1>
+        <h1>Search for your preferable upper or downer. Hanna's the most correct and the best version :) </h1>
         <p>Hint: Diazepam or Methylphenidate</p>
         <p>Have a nice day!!!</p>
       </div>
