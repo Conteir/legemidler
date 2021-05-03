@@ -72,7 +72,7 @@ const useSearch = () => {
 const Search = ({ scope }: SearchProps) => {
   const {
   //  query,
-    setQuery,
+  // setQuery,
     host,
     branch,
     setBranch,
