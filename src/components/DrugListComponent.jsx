@@ -85,7 +85,7 @@ export const DrugListComponent = class DrugListComponent extends React.Component
       return (
           <div>
               <div>
-                  <button onClick={this.getDrugs}>Søk etter legemiddel</button>
+                  <button onClick={this.getDrugs} disabled={this.props.isDisabled}>Søk etter legemiddel</button>
               </div>
               <div>
                 <ul>

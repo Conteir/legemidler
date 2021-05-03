@@ -8,6 +8,7 @@ import Error from "../components/Error";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
 import DrugListComponent from "../components/DrugListComponent";
+import DrugAutoSuggest from "../components/DrugAutoSuggest";
 import { defaultBranch, hosts, defaultConceptIdSubstance } from "../config";
 import {
   fetchBranches,
@@ -44,7 +45,8 @@ const useSearch = () => {
       return debouncedSearch(host, branch, query || "");
     }
     return ({} as any) as Readonly<IConceptResult>;
-  }, [query, branch, intendedSite, form, rel, adm]); // Ensure a new request is made everytime the text changes (even if it's debounced)
+  }, [query, branch, intendedSite, form, rel, adm, substance]); // Ensure a new request is made everytime the text changes (even if it's debounced)
+  //                                               ^ added substance to rerun search on substance change
 
   // Return everything needed for the hook consumer
   return {
@@ -205,6 +207,14 @@ const Search = ({ scope }: SearchProps) => {
     setQuery(event.target.value);
   };
 
+  // Clear all selects on substance change (because of loading new options on each select change, variants depend on substance)
+  const clearSubstanceParameters = () => {
+    setRel('');
+    setAdm('');
+    setIntendedSite('');
+    setForm('');
+  }
+
   const branches = branchRequest.result || [];
   //const intendedSites = intededSiteRequest.result || [];
   const { items = [] } = searchRequest.result || {};
@@ -288,7 +298,13 @@ const Search = ({ scope }: SearchProps) => {
                 <div className="col-md-12">
                   <div className="form-group">
                     <label htmlFor="query">Substans</label>
-                    <input
+                    <DrugAutoSuggest
+                      host={host}
+                      branch={branch}
+                      suggestCallback={handleSubstanceChange}
+                      clearCallback={clearSubstanceParameters}
+                    />
+                    {/*<input
                       id="query"
                       className="form-control"
                       type="text"
@@ -324,7 +340,7 @@ const Search = ({ scope }: SearchProps) => {
                           ),
                         )}
                       </ul>
-                    </section>
+                    </section>*/}
                     <p>Valgt legemiddel: {substance} </p>
                   </div>
                 </div>
@@ -333,8 +349,8 @@ const Search = ({ scope }: SearchProps) => {
                     <div className="form-group">
                       <label htmlFor="Frigivelse">Frigivelse:</label>
                       <select
-                        defaultValue=""
                         id="rel"
+                        value={rel || ''}
                         className="form-control"
                         onChange={handleRelChange}
                       >
@@ -356,7 +372,7 @@ const Search = ({ scope }: SearchProps) => {
                     <div className="form-group">
                       <label htmlFor="admMetode">Adm. metode</label>
                       <select
-                        defaultValue=""
+                        value={adm || ''}
                         id="adm"
                         className="form-control"
                         onChange={handleAdmChange}
@@ -377,7 +393,7 @@ const Search = ({ scope }: SearchProps) => {
                     <div className="form-group">
                       <label htmlFor="intendedSite">Intended site:</label>
                       <select
-                        defaultValue=""
+                        value={intendedSite || ''}
                         id="conceptIdSite"
                         className="form-control"
                         onChange={handleIntendedSiteChange}
@@ -401,7 +417,7 @@ const Search = ({ scope }: SearchProps) => {
                       <label htmlFor="form">Form:</label>
 
                       <select
-                        defaultValue=""
+                        value={form || ''}
                         id="form"
                         className="form-control"
                         onChange={handleFormChange}
@@ -422,6 +438,7 @@ const Search = ({ scope }: SearchProps) => {
               </div>
               {/*<input type="submit" value="Søk etter legemiddel" />*/}
               <DrugListComponent
+                isDisabled={!rel || !intendedSite || !adm || !form}
                 genericUrl={fetchGenericUrl}
                 commercialUrl={fetchCommercial}
               />
