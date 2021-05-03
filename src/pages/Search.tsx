@@ -18,10 +18,6 @@ import {
   IConceptResult,
 } from "../store";
 
-let conceptIdSubstance = defaultConceptIdSubstance;
-
-console.log(conceptIdSubstance);
-
 type SearchProps = {
   scope: string;
 };
@@ -34,6 +30,10 @@ const useSearch = () => {
   const [form, setForm] = useQueryParam("f", StringParam);
   const [rel, setRel] = useQueryParam("r", StringParam);
   const [adm, setAdm] = useQueryParam("a", StringParam);
+  const [substance = defaultConceptIdSubstance, setSubstance] = useQueryParam(
+    "s",
+    StringParam,
+  );
 
   // Debounce the original search async function
   const debouncedSearch = useConstant(() => debounce(fetchConcepts, 500));
@@ -54,6 +54,8 @@ const useSearch = () => {
     rel,
     adm,
     intendedSite,
+    substance,
+    setSubstance,
     searchRequest,
     setBranch,
     setHost,
@@ -64,7 +66,6 @@ const useSearch = () => {
     setRel,
   };
 };
-
 const Search = ({ scope }: SearchProps) => {
   const {
     query,
@@ -75,6 +76,8 @@ const Search = ({ scope }: SearchProps) => {
     setHost,
     intendedSite,
     setIntendedSite,
+    substance,
+    setSubstance,
     rel,
     setRel,
     adm,
@@ -99,7 +102,7 @@ const Search = ({ scope }: SearchProps) => {
   const intededSiteRequest = useAsync(fetchIntendedSites, [
     host || hosts[0],
     branch || defaultBranch,
-    conceptIdSubstance,
+    substance,
   ]);
 
   useEffect(() => {
@@ -116,7 +119,7 @@ const Search = ({ scope }: SearchProps) => {
   const adminRequest = useAsync(fetchAdms, [
     host || hosts[0],
     branch || defaultBranch,
-    conceptIdSubstance,
+    substance,
   ]);
 
   useEffect(() => {
@@ -132,7 +135,7 @@ const Search = ({ scope }: SearchProps) => {
   const relRequest = useAsync(fetchReleases, [
     host || hosts[0],
     branch || defaultBranch,
-    conceptIdSubstance,
+    substance,
   ]);
 
   useEffect(() => {
@@ -189,6 +192,10 @@ const Search = ({ scope }: SearchProps) => {
     setAdm(event.target.value);
   };
 
+  const handleSubstanceChange = (conceptId: string) => {
+    setSubstance(conceptId);
+  };
+
   const handleRelChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setRel(event.target.value);
   };
@@ -205,9 +212,9 @@ const Search = ({ scope }: SearchProps) => {
     "/" +
     (branch || defaultBranch) +
     "/concepts?ecl=%3C%3C763158003%3A762949000%3D(" +
-    conceptIdSubstance +
+    substance +
     "%20OR%20(%3C%3C105590001%3A738774007%3D" +
-    conceptIdSubstance +
+    substance +
     "))%2C411116001%3D((%3C%3C736542009%3A736475003%3D" +
     rel +
     "%2C736472000%3D" +
@@ -299,15 +306,7 @@ const Search = ({ scope }: SearchProps) => {
                             },
                           }) => (
                             <li
-                              onClick={() => {
-                                conceptIdSubstance = conceptId;
-                                console.log(
-                                  "Dopet " +
-                                    preferredTerm +
-                                    " har SCTID " +
-                                    conceptId,
-                                );
-                              }}
+                              onClick={() => handleSubstanceChange(conceptId)}
                               style={{ cursor: "pointer" }}
                               key={conceptId}
                               className="list-group-item mb-12"
@@ -325,6 +324,7 @@ const Search = ({ scope }: SearchProps) => {
                         )}
                       </ul>
                     </section>
+                    <p>Valgt legemiddel: {substance} </p>
                   </div>
                 </div>
                 <div className="row">

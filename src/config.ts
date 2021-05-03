@@ -19,7 +19,7 @@ export const referenceSets = [
   },
 ];
 
-export const limit = "5";
+export const limit = "3";
 
 export const languages = ["nb-NO", "nb", "nn", "no"];
 
