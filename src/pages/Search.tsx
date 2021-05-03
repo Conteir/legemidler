@@ -3,7 +3,7 @@ import React, { ChangeEvent, FormEvent, useEffect } from "react";
 import { useAsync } from "react-async-hook";
 import useConstant from "use-constant";
 import { StringParam, useQueryParam } from "use-query-params";
-import Concept from "../components/Concept";
+//import Concept from "../components/Concept";
 import Error from "../components/Error";
 import Header from "../components/Header";
 import Loading from "../components/Loading";
@@ -71,7 +71,7 @@ const useSearch = () => {
 };
 const Search = ({ scope }: SearchProps) => {
   const {
-    query,
+  //  query,
     setQuery,
     host,
     branch,
@@ -203,9 +203,9 @@ const Search = ({ scope }: SearchProps) => {
     setRel(event.target.value);
   };
 
-  const handleQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setQuery(event.target.value);
-  };
+  //const handleQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
+  //  setQuery(event.target.value);
+  //};
 
   // Clear all selects on substance change (because of loading new options on each select change, variants depend on substance)
   const clearSubstanceParameters = () => {
@@ -217,7 +217,7 @@ const Search = ({ scope }: SearchProps) => {
 
   const branches = branchRequest.result || [];
   //const intendedSites = intededSiteRequest.result || [];
-  const { items = [] } = searchRequest.result || {};
+  // const { items = [] } = searchRequest.result || {};
   const fetchGenericUrl =
     (host || hosts[0]) +
     "/" +
