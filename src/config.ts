@@ -23,7 +23,7 @@ export const limit = "3";
 
 export const languages = ["nb-NO", "nb", "nn", "no"];
 
-export const defaultConceptIdSubstance = "387264003"; //Diazepam hardcode
+export const defaultConceptIdSubstance = ""; //Diazepam hardcode was 387264003
 
 export const fetchConceptIdSite = (
   conceptIdSubstance: string = defaultConceptIdSubstance,

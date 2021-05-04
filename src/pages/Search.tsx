@@ -19,6 +19,7 @@ import {
   fetchConcepts,
   IConceptResult,
 } from "../store";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 type SearchProps = {
   scope: string;
@@ -36,6 +37,8 @@ const useSearch = () => {
     "s",
     StringParam,
   );
+  //const [isLoad, setIsLoad] = useQueryParam("i", BooleanParam);
+
 
   // Debounce the original search async function
   const debouncedSearch = useConstant(() => debounce(fetchConcepts, 500));
@@ -341,7 +344,7 @@ const Search = ({ scope }: SearchProps) => {
                         )}
                       </ul>
                     </section>*/}
-                    <p>Valgt legemiddel: {substance} </p>
+                    {/**<p>SNOMED CT id: {substance} </p> */}
                   </div>
                 </div>
                 <div className="row">
@@ -442,6 +445,13 @@ const Search = ({ scope }: SearchProps) => {
                 genericUrl={fetchGenericUrl}
                 commercialUrl={fetchCommercial}
               />
+             {/*<div>
+             {
+                (rel && intendedSite && adm && form && DrugListComponent) ? <Loading/> : null
+              } 
+               </div>
+              */}
+            
             </form>
           )}
         </div>
@@ -455,82 +465,6 @@ const Search = ({ scope }: SearchProps) => {
             {searchRequest.error && (
               <Error>{searchRequest.error.message}</Error>
             )}
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-12">
-            <h2>Fetch generic dugs</h2>
-          </div>
-          <div className="col-12">
-            <p>
-              When botton is clicked, we should run request below. Please note{" "}
-              <br />
-              that the URL is dynamicly generated be the application. The
-              <br />
-              substance is for the moment hardcoded to Diazepam (this could be
-              <br />
-              changed in the config.ts)
-            </p>
-            <p>Fetch gerneric URL: {fetchGenericUrl} </p>
-            <p>
-              The result will be generic drugs based upon substance (always{" "}
-              <br />
-              Diazepam), administation route, form, intended site and release.{" "}
-              <br />
-            </p>
-            <p>
-              You can try to generate an url based on:
-              <br />
-              - Frigivelse: Conventional release
-              <br />
-              - Adm.metode: Swallow
-              <br />
-              - Intended site: oral
-              <br />- Form: Tablett
-            </p>
-            <p>The result should be sevral generic clinical drugs</p>
-
-            <h3>Render first part</h3>
-
-            <p>The result should be rendered like this:</p>
-            <ul>
-              <li>Generic drug 1: [preferredTerm] [concetpId]</li>
-              <li>Generic drug 2: [preferredTerm] [concetpId]</li>
-              <li>[...]</li>
-            </ul>
-            <h2>Fetch commercial drugs</h2>
-            <p>
-              Each of this generic drugs could have one or more commercial drugs
-            </p>
-            <p>
-              To fetch this, we have to use the conceptId from the last <br />
-              response, and do a new query for each gerenic drug
-            </p>
-            <p>
-              You could use this url, where [genericDrugId] = conceptId in the
-              first response
-            </p>
-            <p>Fetch commercial URL: {fetchCommercial} </p>
-            <p>... so you have to do this request for EVERY generic drug</p>
-            <h3>Render it all</h3>
-            <p>The overall result should be like this:</p>
-            <ul>
-              <li>Generic drug 1: [preferredTerm] [concetpId]</li>
-              <ul>
-                <li>Commercial drug 1: [NavnFormStyrke] [MerkevareId]</li>
-                <li>Commercial drug 2: [NavnFormStyrke] [MerkevareId]</li>
-                <li>Commercial drug 3: [NavnFormStyrke] [MerkevareId]</li>
-                <li>[...]</li>
-              </ul>
-              <li>Generic drug 2: [preferredTerm] [concetpId]</li>
-              <ul>
-                <li>Commercial drug 1: [NavnFormStyrke] [MerkevareId]</li>
-                <li>Commercial drug 2: [NavnFormStyrke] [MerkevareId]</li>
-                <li>Commercial drug 3: [NavnFormStyrke] [MerkevareId]</li>
-                <li>[...]</li>
-              </ul>
-              <li>[...]</li>
-            </ul>
           </div>
         </div>
       </div>
