@@ -1,5 +1,5 @@
 /*import React from "react";
-import 'bootstrap/dist/css/bootstrap.min.css';
+
 import "./Loading.css";
 
 const Loading = () => (
@@ -14,7 +14,7 @@ export default Loading;
 import classnames from "classnames";
 import React from "react";
 //import { useTranslation } from "react-i18next";
-
+import 'bootstrap/dist/css/bootstrap.min.css';
 import "./Loading.css";
 
 export enum LoadingSize {

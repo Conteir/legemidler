@@ -33,10 +33,9 @@ const useSearch = () => {
   const [form, setForm] = useQueryParam("f", StringParam);
   const [rel, setRel] = useQueryParam("r", StringParam);
   const [adm, setAdm] = useQueryParam("a", StringParam);
-  const [substance = defaultConceptIdSubstance, setSubstance] = useQueryParam(
-    "s",
-    StringParam,
-  );
+  const [
+    substance = defaultConceptIdSubstance, setSubstance
+    ] = useQueryParam("s", StringParam);
   //const [isLoad, setIsLoad] = useQueryParam("i", BooleanParam);
 
 
@@ -93,7 +92,7 @@ const Search = ({ scope }: SearchProps) => {
     searchRequest,
   } = useSearch();
 
-  const branchRequest = useAsync(fetchBranches, [host || hosts[0]]);
+  const branchRequest = useAsync(fetchBranches, [hosts[0] || hosts[1]|| hosts[2]]);
 
   useEffect(() => {
     if (branchRequest.result && !branch) {
@@ -106,7 +105,7 @@ const Search = ({ scope }: SearchProps) => {
   }, [branch, branchRequest, setBranch]);
 
   const intededSiteRequest = useAsync(fetchIntendedSites, [
-    host || hosts[0],
+    hosts[0] || hosts[1]|| hosts[2],
     branch || defaultBranch,
     substance,
   ]);
@@ -123,7 +122,7 @@ const Search = ({ scope }: SearchProps) => {
   }, [intendedSite, intededSiteRequest, setIntendedSite]);
 
   const adminRequest = useAsync(fetchAdms, [
-    host || hosts[0],
+    hosts[0] || hosts[1]|| hosts[2],
     branch || defaultBranch,
     substance,
   ]);
@@ -139,7 +138,7 @@ const Search = ({ scope }: SearchProps) => {
   }, [adm, adminRequest, setAdm]);
 
   const relRequest = useAsync(fetchReleases, [
-    host || hosts[0],
+    hosts[0] || hosts[1]|| hosts[2],
     branch || defaultBranch,
     substance,
   ]);
@@ -155,7 +154,7 @@ const Search = ({ scope }: SearchProps) => {
   }, [rel, relRequest, setRel]);
 
   const formRequest = useAsync(fetchForms, [
-    host || hosts[0],
+    hosts[0] || hosts[1]|| hosts[2],
     branch || defaultBranch,
   ]);
 
@@ -171,7 +170,7 @@ const Search = ({ scope }: SearchProps) => {
 
   useEffect(() => {
     if (!host) {
-      setHost(hosts[0]);
+      setHost(hosts[0] || hosts[1]|| hosts[2]);
     }
   }, [host, setHost]);
 
@@ -222,32 +221,32 @@ const Search = ({ scope }: SearchProps) => {
   //const intendedSites = intededSiteRequest.result || [];
   // const { items = [] } = searchRequest.result || {};
   const fetchGenericUrl =
-    (host || hosts[0]) +
+    (hosts[0] || hosts[1]|| hosts[2]) +
     "/" +
     (branch || defaultBranch) +
-    "/concepts?ecl=%3C%3C763158003%3A762949000%3D(" +
+    "/concepts?ecl=<<763158003:762949000=(" +
     substance +
-    "%20OR%20(%3C%3C105590001%3A738774007%3D" +
+    " OR (<<105590001:738774007=" +
     substance +
-    "))%2C411116001%3D((%3C%3C736542009%3A736475003%3D" +
+    ")),411116001=((<<736542009:736475003=" +
     rel +
-    "%2C736472000%3D" +
+    ",736472000=" +
     adm +
-    "%2C736474004%3D" +
+    ",736474004=" +
     intendedSite +
-    "%2C736476002%3D" +
+    ",736476002=" +
     form +
-    ")%20OR%20%20(%3C%3C736542009%3A736475003%3D" +
+    ") OR  (<<736542009:736475003=" +
     rel +
-    "%2C736472000%3D" +
+    ",736472000=" +
     adm +
-    "%2C736474004%3D" +
+    ",736474004=" +
     intendedSite +
-    "%2C736476002%3D" +
+    ",736476002=" +
     form +
-    "%2C736473005%3D736853009))";
+    ",736473005=736853009))";
   const fetchCommercial =
-    (host || hosts[0]) +
+    (hosts[0] || hosts[1]|| hosts[2]) +
     "/browser/" +
     "MAIN%2FSNOMEDCT-NO%2FREFSETS/members?referenceSet=6021000202106&referencedComponentId=";
 
